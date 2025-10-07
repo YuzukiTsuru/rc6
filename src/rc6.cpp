@@ -1,3 +1,10 @@
+/**
+ * @file rc6.cpp
+ * @brief Implementation file for the RC6 block cipher algorithm.
+ * 
+ * This file provides the implementation of the RC6 block cipher algorithm
+ * as defined in the rc6.hpp header file.
+ */
 #include <algorithm>
 
 #include "rc6.hpp"
@@ -5,30 +12,67 @@
 using namespace openiximg;
 using namespace crypto;
 
-// Default constructor
+/**
+ * @brief Default constructor for RC6 class.
+ * 
+ * Initializes the RC6 object with the default number of rounds (20).
+ */
 RC6::RC6() : rounds_(20) {
 }
 
-// Constructor with custom number of rounds
+/**
+ * @brief Constructor with custom number of rounds.
+ * 
+ * Initializes the RC6 object with the specified number of rounds.
+ * 
+ * @param rounds The number of rounds to use (must be between 0 and 125).
+ * @throws std::invalid_argument if the number of rounds is greater than 125.
+ */
 RC6::RC6(const uint8_t rounds) : rounds_(rounds) {
     if (rounds > 125) {
         throw std::invalid_argument("Number of rounds must be between 0 and 125");
     }
 }
 
-// Rotate left helper function
+/**
+ * @brief Rotate left helper function.
+ * 
+ * Performs a bitwise rotate left operation on a 32-bit value.
+ * 
+ * @param a The 32-bit value to rotate.
+ * @param n The number of bits to rotate (mod 32).
+ * @return The rotated 32-bit value.
+ */
 uint32_t RC6::rotl32(const uint32_t a, uint8_t n) {
     n &= 0x1f; // Higher rotates would not bring anything
     return ((a << n) | (a >> (32 - n)));
 }
 
-// Rotate right helper function
+/**
+ * @brief Rotate right helper function.
+ * 
+ * Performs a bitwise rotate right operation on a 32-bit value.
+ * 
+ * @param a The 32-bit value to rotate.
+ * @param n The number of bits to rotate (mod 32).
+ * @return The rotated 32-bit value.
+ */
 uint32_t RC6::rotr32(const uint32_t a, uint8_t n) {
     n &= 0x1f; // Higher rotates would not bring anything
     return ((a >> n) | (a << (32 - n)));
 }
 
-// Initialize the cipher with a key
+/**
+ * @brief Initialize the cipher with a key.
+ * 
+ * Sets up the RC6 cipher with the provided key material, expanding
+ * it into round keys according to the RC6 key schedule algorithm.
+ * 
+ * @param key Pointer to the key data.
+ * @param keylength_bits Length of the key in bits.
+ * @throws std::invalid_argument if key is null or keylength_bits is zero.
+ * @throws std::invalid_argument if the number of rounds is greater than 125.
+ */
 void RC6::init(const void *key, const uint16_t keylength_bits) {
     if (key == nullptr) {
         throw std::invalid_argument("Key cannot be null");
@@ -88,7 +132,17 @@ void RC6::init(const void *key, const uint16_t keylength_bits) {
     }
 }
 
-// Encrypt a block of data
+/**
+ * @brief Encrypt a block of data using the RC6 algorithm.
+ * 
+ * Encrypts a 16-byte (128-bit) block of data using the previously
+ * initialized RC6 cipher with the provided key.
+ * 
+ * @param block Pointer to the 16-byte block to encrypt. The block will be
+ *              overwritten with the encrypted data.
+ * @throws std::runtime_error if the cipher is not initialized.
+ * @throws std::invalid_argument if block is null.
+ */
 void RC6::encrypt(void *block) const {
     if (!isInitialized()) {
         throw std::runtime_error("RC6 not initialized");
@@ -131,7 +185,17 @@ void RC6::encrypt(void *block) const {
     data[3] = d;
 }
 
-// Decrypt a block of data
+/**
+ * @brief Decrypt a block of data using the RC6 algorithm.
+ * 
+ * Decrypts a 16-byte (128-bit) block of data using the previously
+ * initialized RC6 cipher with the provided key.
+ * 
+ * @param block Pointer to the 16-byte block to decrypt. The block will be
+ *              overwritten with the decrypted data.
+ * @throws std::runtime_error if the cipher is not initialized.
+ * @throws std::invalid_argument if block is null.
+ */
 void RC6::decrypt(void *block) const {
     if (!isInitialized()) {
         throw std::runtime_error("RC6 not initialized");
@@ -174,7 +238,13 @@ void RC6::decrypt(void *block) const {
     data[3] = d;
 }
 
-// Check if the cipher is initialized
+/**
+ * @brief Check if the cipher is initialized.
+ * 
+ * Determines whether the RC6 cipher has been initialized with a key.
+ * 
+ * @return True if the cipher has been initialized with a key, false otherwise.
+ */
 bool RC6::isInitialized() const {
     return !round_keys_.empty();
 }
