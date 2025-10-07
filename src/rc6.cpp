@@ -6,11 +6,9 @@
  * as defined in the rc6.hpp header file.
  */
 #include <algorithm>
+#include <climits>
 
 #include "rc6.hpp"
-
-using namespace openiximg;
-using namespace crypto;
 
 /**
  * @brief Default constructor for RC6 class.

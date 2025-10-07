@@ -16,52 +16,52 @@ void printBlock(const uint8_t *block, const size_t size) {
 
 // Function to run a test case
 void runTestCase(const std::string &testName,
-                const uint8_t *plaintext,
-                const uint8_t *key,
-                uint16_t keyLengthBits,
-                const uint8_t *expectedCiphertext) {
+                 const uint8_t *plaintext,
+                 const uint8_t *key,
+                 const uint16_t keyLengthBits,
+                 const uint8_t *expectedCiphertext) {
     std::cout << testName << std::endl;
     std::cout << "===============================" << std::endl;
-    
+
     // Create RC6 object with default rounds (20)
-    openiximg::crypto::RC6 rc6;
-    
+    RC6 rc6;
+
     // Initialize with key
     rc6.init(key, keyLengthBits);
-    
+
     std::cout << "Plaintext:  ";
     printBlock(plaintext, 16);
-    
+
     std::cout << "Key:        ";
     printBlock(key, keyLengthBits / 8);
-    
+
     // Encrypt
     uint8_t ciphertext[16];
     std::memcpy(ciphertext, plaintext, 16);
     rc6.encrypt(ciphertext);
-    
+
     std::cout << "Ciphertext: ";
     printBlock(ciphertext, 16);
-    
+
     std::cout << "Expected:   ";
     printBlock(expectedCiphertext, 16);
-    
+
     // Decrypt
     uint8_t decryptedtext[16];
     std::memcpy(decryptedtext, ciphertext, 16);
     rc6.decrypt(decryptedtext);
-    
+
     std::cout << "Decrypted:  ";
     printBlock(decryptedtext, 16);
-    
+
     // Verify ciphertext matches expected
-    bool ciphertextMatch = (std::memcmp(ciphertext, expectedCiphertext, 16) == 0);
+    const bool ciphertextMatch = (std::memcmp(ciphertext, expectedCiphertext, 16) == 0);
     std::cout << "Ciphertext verification: " << (ciphertextMatch ? "PASSED" : "FAILED") << std::endl;
-    
+
     // Verify decryption is correct
-    bool decryptionMatch = (std::memcmp(plaintext, decryptedtext, 16) == 0);
+    const bool decryptionMatch = (std::memcmp(plaintext, decryptedtext, 16) == 0);
     std::cout << "Decryption verification: " << (decryptionMatch ? "PASSED" : "FAILED") << std::endl;
-    
+
     std::cout << std::endl;
 }
 
@@ -70,7 +70,7 @@ int main() {
         std::cout << "RC6 Test Suite" << std::endl;
         std::cout << "==============" << std::endl;
         std::cout << std::endl;
-        
+
         // Test Case 1: All zeros plaintext and 128-bit key
         const uint8_t plaintext1[16] = {
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -85,7 +85,7 @@ int main() {
             0xc1, 0x29, 0xdf, 0x4e, 0x98, 0x48, 0xa4, 0x1e
         };
         runTestCase("Test Case 1: All zeros (128-bit key)", plaintext1, key1, 128, expectedCiphertext1);
-        
+
         // Test Case 2: Non-zero plaintext and 128-bit key
         const uint8_t plaintext2[16] = {
             0x02, 0x13, 0x24, 0x35, 0x46, 0x57, 0x68, 0x79,
@@ -100,7 +100,7 @@ int main() {
             0x1f, 0x51, 0xf6, 0x36, 0x7e, 0xa4, 0x3f, 0x18
         };
         runTestCase("Test Case 2: Non-zero (128-bit key)", plaintext2, key2, 128, expectedCiphertext2);
-        
+
         // Test Case 3: All zeros plaintext and 192-bit key
         const uint8_t key3[24] = {
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -112,7 +112,7 @@ int main() {
             0x4e, 0x8a, 0x3f, 0x16, 0x86, 0x90, 0xae, 0x82
         };
         runTestCase("Test Case 3: All zeros (192-bit key)", plaintext1, key3, 192, expectedCiphertext3);
-        
+
         // Test Case 4: Non-zero plaintext and 192-bit key
         const uint8_t key4[24] = {
             0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
@@ -124,7 +124,7 @@ int main() {
             0x1e, 0x52, 0xe9, 0x2a, 0xf9, 0x52, 0x91, 0xd4
         };
         runTestCase("Test Case 4: Non-zero (192-bit key)", plaintext2, key4, 192, expectedCiphertext4);
-        
+
         // Test Case 5: All zeros plaintext and 256-bit key
         const uint8_t key5[32] = {
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -137,7 +137,7 @@ int main() {
             0x93, 0xfa, 0x3f, 0xda, 0x6e, 0x85, 0x7e, 0xc2
         };
         runTestCase("Test Case 5: All zeros (256-bit key)", plaintext1, key5, 256, expectedCiphertext5);
-        
+
         // Test Case 6: Non-zero plaintext and 256-bit key
         const uint8_t key6[32] = {
             0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
@@ -150,39 +150,39 @@ int main() {
             0x20, 0xad, 0x16, 0xa1, 0x67, 0x4e, 0x5d, 0x48
         };
         runTestCase("Test Case 6: Non-zero (256-bit key)", plaintext2, key6, 256, expectedCiphertext6);
-        
+
         // Test with custom number of rounds
         std::cout << "\nTesting with 12 rounds" << std::endl;
         std::cout << "==================" << std::endl;
-        
+
         // Use Test Case 1 with 12 rounds
-        openiximg::crypto::RC6 rc6_12rounds(12);
+        RC6 rc6_12rounds(12);
         rc6_12rounds.init(key1, 128);
-        
+
         uint8_t ciphertext12[16];
         std::memcpy(ciphertext12, plaintext1, 16);
-        
+
         // Encrypt
         rc6_12rounds.encrypt(ciphertext12);
         std::cout << "Plaintext (12 rounds):  ";
         printBlock(plaintext1, 16);
         std::cout << "Ciphertext (12 rounds): ";
         printBlock(ciphertext12, 16);
-        
+
         // Decrypt
         uint8_t decryptedtext12[16];
         std::memcpy(decryptedtext12, ciphertext12, 16);
         rc6_12rounds.decrypt(decryptedtext12);
         std::cout << "Decrypted (12 rounds):  ";
         printBlock(decryptedtext12, 16);
-        
+
         // Verify decryption is correct
         if (std::memcmp(plaintext1, decryptedtext12, 16) == 0) {
             std::cout << "Test passed: Decryption with 12 rounds matches plaintext!" << std::endl;
         } else {
             std::cout << "Test failed: Decryption with 12 rounds does not match plaintext!" << std::endl;
         }
-        
+
         std::cout << "\nAll tests completed!" << std::endl;
         return 0;
     } catch (const std::exception &e) {

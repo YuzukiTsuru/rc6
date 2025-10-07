@@ -49,7 +49,7 @@ ctest
 
 int main() {
     // Create RC6 object (default is 20 rounds)
-    openiximg::crypto::RC6 rc6;
+    RC6 rc6;
     
     // Initialize with a key
     const uint8_t key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 
@@ -74,7 +74,7 @@ int main() {
 
 ```cpp
 // Create RC6 object with 12 rounds
-openiximg::crypto::RC6 rc6_12rounds(12);
+RC6 rc6_12rounds(12);
 
 // The rest is the same as above
 rc6_12rounds.init(key, key_length_bits);
